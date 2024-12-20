@@ -1,0 +1,95 @@
+select * from public."hrs"
+
+alter table public."hrs"
+alter column id set data type varchar(20)
+
+alter table public."hrs"
+alter column id DROP NOT NULL
+	
+set datestyle = 'ISO, YMD'
+
+UPDATE public."hrs"
+SET birthdate = CASE
+    WHEN birthdate LIKE '%/%' THEN to_char(TO_DATE(birthdate, 'MM/DD/YYYY'), 'YYYY/MM/DD')
+    WHEN birthdate LIKE '%-%' THEN to_char(TO_DATE(birthdate, 'MM-DD-YYYY'), 'YYYY/MM/DD')
+    ELSE NULL
+END
+WHERE birthdate IS NOT NULL AND birthdate != '';
+
+
+UPDATE public."hrs"
+SET birthdate = 
+    CASE
+        WHEN birthdate LIKE '____/__/__' THEN
+            CASE
+                
+                WHEN SUBSTRING(birthdate FROM 3 FOR 2) > '30' THEN
+                    '19' || SUBSTRING(birthdate FROM 3 FOR 2) || '/' || SUBSTRING(birthdate FROM 6 FOR 5)
+
+        
+                WHEN SUBSTRING(birthdate FROM 3 FOR 2) < '30' THEN
+                    '20' || SUBSTRING(birthdate FROM 3 FOR 2) || '/' || SUBSTRING(birthdate FROM 6 FOR 5)
+
+                
+                ELSE birthdate
+            END
+        ELSE birthdate  
+    END;
+
+alter table public."hrs"
+alter column birthdate set data type date
+using birthdate :: date
+
+	
+UPDATE public."hrs"
+SET hire_date = CASE
+    WHEN hire_date LIKE '%/%' THEN to_char(TO_DATE(hire_date, 'MM/DD/YYYY'), 'YYYY/MM/DD')
+    WHEN hire_date LIKE '%-%' THEN to_char(TO_DATE(hire_date, 'MM-DD-YYYY'), 'YYYY/MM/DD')
+    ELSE NULL
+END
+WHERE hire_date IS NOT NULL AND hire_date != '';
+
+UPDATE public."hrs"
+SET hire_date = 
+    CASE
+        WHEN hire_date LIKE '____/__/__' THEN
+            CASE
+                
+                WHEN SUBSTRING(hire_date FROM 3 FOR 2) > '30' THEN
+                    '19' || SUBSTRING(hire_date FROM 3 FOR 2) || '/' || SUBSTRING(hire_date FROM 6 FOR 5)
+
+        
+                WHEN SUBSTRING(hire_date FROM 3 FOR 2) < '30' THEN
+                    '20' || SUBSTRING(hire_date FROM 3 FOR 2) || '/' || SUBSTRING(hire_date FROM 6 FOR 5)
+
+                
+                ELSE hire_date
+            END
+        ELSE hire_date  
+    END;
+
+
+alter table public."hrs"
+alter column hire_date set data type date
+using hire_date :: date
+
+UPDATE public."hrs"
+SET termndate = to_date(to_timestamp(termndate, 'YYYY-MM-DD HH24:MI:SS UTC') :: TEXT, 'MM/DD/YYYY')
+where termndate IS NOT NULL and termndate = ' '
+
+alter table public."hrs"
+alter column termndate set data type DATE
+USING termndate :: DATE
+
+alter table public."hrs"
+add column age integer
+
+update public."hrs"
+set age = extract(YEAR from AGE(current_date, birthdate))
+
+select min(age), max(age) from public."hrs"
+
+
+
+
+
